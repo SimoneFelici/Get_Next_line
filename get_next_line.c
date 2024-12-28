@@ -1,66 +1,91 @@
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "get_next_line.h"
 
-#define BUFFER_SIZE 1000
-
-char	*get_next_line(int fd)
+static char	*reader(int fd, char *stash)
 {
-	static int	pos;
-	char		*c;
-	int			sz;
-	int			i;
-	char		*line;
-	int			j;
+	char	*buffer;
+	ssize_t	bytes_read;
+	int		newline_index;
 
-	pos = 0;
-	c = malloc(BUFFER_SIZE + 1);
-	if (!c)
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
 		return (NULL);
-	sz = read(fd, c, BUFFER_SIZE);
-
-	if (sz == -1)
+	newline_index = ft_strchr(stash, '\n');
+	while (newline_index < 0)
 	{
-		free(c);
-		return (NULL);
-	}
-	c[sz] = '\0';
-	i = pos;
-	while (i < sz)
-	{
-		if (c[i] == '\n')
-		{
-			i++;
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read <= 0)
 			break ;
-		}
+		buffer[bytes_read] = '\0';
+		stash = ft_strjoin(stash, buffer);
+		newline_index = ft_strchr(stash, '\n');
+	}
+	free(buffer);
+	return (stash);
+}
+
+static char	*extract_line(char *stash)
+{
+	char	*line;
+	int		newline_index;
+	int		i;
+
+	if (!stash || !stash[0])
+		return (NULL);
+	newline_index = ft_strchr(stash, '\n');
+	if (newline_index < 0)
+		newline_index = ft_strlen(stash) - 1;
+	line = (char *)malloc(sizeof(char) * (newline_index + 2));
+	if (!line)
+		return (NULL);
+	i = 0;
+	while (i <= newline_index)
+	{
+		line[i] = stash[i];
 		i++;
 	}
-	line = malloc(i - pos + 1);
-	j = 0;
-	while (pos < i)
-		line[j++] = c[pos++];
-	line[j] = '\0';
-	free(c);
+	line[i] = '\0';
 	return (line);
 }
 
-int	main(int argc, char **argv)
+static char	*cleaner(char *stash)
 {
-	int		fd;
-	char	*line;
+	char	*new_stash;
+	int		newline_index;
+	int		s_len;
+	int		i;
 
-	if (argc < 2)
-		return (1);
-	fd = open(argv[1], O_RDONLY);
-	line = get_next_line(fd);
-	printf("%s", line);
-	free(line);
+	newline_index = ft_strchr(stash, '\n');
+	if (newline_index < 0)
+	{
+		free(stash);
+		return (NULL);
+	}
+	s_len = ft_strlen(stash);
+	new_stash = (char *)malloc(sizeof(char) * (s_len - newline_index));
+	if (!new_stash)
+		return (NULL);
+	i = 0;
+	while (stash[newline_index + 1 + i])
+	{
+		new_stash[i] = stash[newline_index + 1 + i];
+		i++;
+	}
+	new_stash[i] = '\0';
+	free(stash);
+	return (new_stash);
+}
 
-	line = get_next_line(fd);
-	printf("%s", line);
-	free(line);
+char	*get_next_line(int fd)
+{
+	static char	*stash;
+	char		*line;
 
-	close(fd);
-	return (0);
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	stash = reader(fd, stash);
+	if (!stash)
+		return (NULL);
+	line = extract_line(stash);
+	stash = cleaner(stash);
+	return (line);
 }
