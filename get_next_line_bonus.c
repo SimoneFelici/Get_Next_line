@@ -77,15 +77,15 @@ static char	*cleaner(char *stash)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
+	static char	*stash[OPEN_MAX];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	stash = reader(fd, stash);
-	if (!stash)
+	stash[fd] = reader(fd, stash[fd]);
+	if (!stash[fd])
 		return (NULL);
-	line = extract_line(stash);
-	stash = cleaner(stash);
+	line = extract_line(stash[fd]);
+	stash = cleaner(stash[fd]);
 	return (line);
 }
