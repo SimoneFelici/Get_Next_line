@@ -77,7 +77,7 @@ static char	*cleaner(char *stash)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash[OPEN_MAX];
+	static char	*stash[4096];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
