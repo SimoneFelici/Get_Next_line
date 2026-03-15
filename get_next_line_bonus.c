@@ -86,6 +86,6 @@ char	*get_next_line(int fd)
 	if (!stash[fd])
 		return (NULL);
 	line = extract_line(stash[fd]);
-	stash = cleaner(stash[fd]);
+	stash[fd] = cleaner(stash[fd]);
 	return (line);
 }
