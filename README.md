@@ -87,17 +87,4 @@ The bonus version replaces the single `static char *stash` with `static char *st
 
 ## Resources
 
-- [Static variables in C — GeeksforGeeks](https://www.geeksforgeeks.org/static-variables-in-c/)
-- [File descriptors — man 2 open](https://man7.org/linux/man-pages/man2/open.2.html)
-- [read() syscall — man 2 read](https://man7.org/linux/man-pages/man2/read.2.html)
-- [Memory management in C — malloc/free](https://man7.org/linux/man-pages/man3/malloc.3.html)
-
-### AI Usage
-
-Claude (claude.ai) was used in this project for the following tasks:
-- Verifying that the existing code respected the subject requirements
-- Identifying and fixing bugs in the bonus files (wrong `#include`, wrong header guard, typo `stash = cleaner(stash[fd])` instead of `stash[fd] = cleaner(stash[fd])`)
-- Discussing the `OPEN_MAX` portability issue on Linux and choosing `MAX_FD 4096` as a solution
-- Writing this README
-
-The core algorithm and all source code were written independently before AI assistance was used for review.
+I don't remember
